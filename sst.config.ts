@@ -20,7 +20,7 @@ export default $config({
         output: "dist",
       },
       domain: {
-        name: `test-finology.muhammadhafizm.com`,
+        name: `test-finology.mhafizmaulana.com`,
         dns: sst.aws.dns({
           zone: process.env.HOSTED_ZONE!,
         }),
