@@ -1,0 +1,46 @@
+name: Deploy (dev)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      HOSTED_ZONE: ${{ secrets.HOSTED_ZONE }}
+      CERT_ARN: ${{ secrets.CERT_ARN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        with: { version: 9 }
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ap-southeast-1
+          role-to-assume: arn:aws:iam::796675940130:role/RepoDeployTestFinology
+          role-session-name: GitHubActions-TestFinology
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Deploy with SST
+        run: pnpm sst:deploy --stage dev
