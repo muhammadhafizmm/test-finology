@@ -1,35 +1,27 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Container, Flex } from "@chakra-ui/react";
+import { useState } from "react";
+import "./App.css";
+
+import Hero from "./components/Hero";
+import UserGrid from "./components/UserGrid";
+import UserSearch from "./components/UserSearch";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [_, setSearchQuery] = useState("");
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Flex direction="column" spaceY="4" mb="10">
+      <Container>
+        <Hero />
+      </Container>
+      <Container>
+        <Flex w="full" direction="column" gap="5">
+          <UserSearch onChange={setSearchQuery} />
+          <UserGrid />
+        </Flex>
+      </Container>
+    </Flex>
+  );
 }
 
-export default App
+export default App;
