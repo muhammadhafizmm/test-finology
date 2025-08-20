@@ -1,87 +1,71 @@
-import { Avatar, Button, Card, Flex, For, Stack, Text } from "@chakra-ui/react";
-import { users } from "../constant/mocks";
-import { createMapUrl } from "../utils/maps";
-import { getUserInitial } from "../utils/user";
+import { Button, Flex, For, Stack, Text } from "@chakra-ui/react";
 
-export default function UserGrid() {
-  function onClickViewOnMaps(lat: string, lng: string) {
-    const url = createMapUrl(lat, lng);
-    location.href = url;
+import { useGetAllUser } from "../hooks/user";
+import { User } from "../types/User";
+import UserCard from "./UserCard";
+
+type Props = {
+  useQuery: typeof useGetAllUser;
+};
+
+export default function UserGrid({ useQuery }: Props) {
+  const { data: users, loading, error, refetch } = useQuery();
+
+  if (loading) return <Loading />;
+  if (error) {
+    // Log the error to the console for debugging
+    console.error("[UserGrid] Error fetching users:", error);
+    return <Error onRetry={refetch} />;
   }
-  function onClickVisitWebsite(url: string) {
-    location.href = url;
-  }
+  if (!users || users.length === 0) return <Empty />;
+
+  return <Data users={users} />;
+}
+
+type DataProps = {
+  users: User[];
+};
+function Data({ users }: DataProps) {
   return (
     <Stack gap="5" direction="row" wrap="wrap" justify="center">
-      <For each={users}>
-        {(user) => {
-          const { id, name, email, address, company, phone, website } = user;
-          return (
-            <Card.Root variant="outline" key={id}>
-              <Card.Body gap="2">
-                <Flex gap="3" align="center">
-                  <Avatar.Root size="lg" shape="rounded">
-                    <Avatar.Fallback>{getUserInitial(name)}</Avatar.Fallback>
-                  </Avatar.Root>
-                  <Flex direction="column">
-                    <Text textAlign="md" fontWeight="semibold">
-                      {name}
-                    </Text>
-                    <Text textStyle="sm">{email}</Text>
-                  </Flex>
-                </Flex>
-                <UserInfo label="Company" value={company.name} />
-                <UserInfo label="Phone" value={phone} />
-                <UserInfo label="Username" value={website} />
-                <Flex gap="2">
-                  <Text textStyle="sm" color="gray.500">
-                    Address
-                  </Text>
-                  <Text textStyle="sm">
-                    {address.suite && `${address.suite}, `}
-                    {address.street}
-                    <br />
-                    {address.city}, {address.zipcode}
-                  </Text>
-                </Flex>
-              </Card.Body>
-              <Card.Footer>
-                <Button
-                  variant="solid"
-                  onClick={() =>
-                    onClickViewOnMaps(address.geo.lat, address.geo.lng)
-                  }
-                >
-                  📍 View on Maps
-                </Button>
-                <Button
-                  variant="solid"
-                  onClick={() => {
-                    onClickVisitWebsite(`https://${website}`);
-                  }}
-                >
-                  Visit Website
-                </Button>
-              </Card.Footer>
-            </Card.Root>
-          );
-        }}
-      </For>
+      <For each={users}>{(user) => <UserCard user={user} key={user.id} />}</For>
     </Stack>
   );
 }
 
-type UserInfoProps = {
-  label: string;
-  value: string;
-};
-function UserInfo({ label, value }: UserInfoProps) {
+function Empty() {
   return (
-    <Flex gap="2" align="center">
-      <Text textStyle="sm" color="gray.500">
-        {label}
-      </Text>
-      <Text textStyle="sm">{value}</Text>
+    <Flex flex={1} justify="center" align="center">
+      <Flex direction="column" align="center" marginBottom={12} gap={2}>
+        <Text fontWeight="medium">No users found</Text>
+        <Text color="fg.muted">Try adjusting your filters.</Text>
+      </Flex>
+    </Flex>
+  );
+}
+
+function Loading() {
+  return (
+    <Stack gap="5" direction="row" wrap="wrap" justify="center">
+      <For each={[...Array(3).keys()]}>{() => <UserCard.Skeleton />}</For>
+    </Stack>
+  );
+}
+
+type ErrorProps = {
+  onRetry: () => void;
+};
+function Error({ onRetry }: ErrorProps) {
+  return (
+    <Flex flex={1} justify="center" align="center">
+      <Flex direction="column" align="center" marginBottom={12} gap={2}>
+        <Text fontWeight="medium">
+          Sorry, we unable to fetch user data. Please try again
+        </Text>
+        <Button variant="solid" onClick={onRetry}>
+          Try again
+        </Button>
+      </Flex>
     </Flex>
   );
 }
