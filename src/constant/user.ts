@@ -1,6 +1,12 @@
-import { User } from "../types/User";
+import { User, UserFilterValue } from "../types/User";
 
-export const users: User[] = [
+export const FILTER_INITIAL_VALUE: UserFilterValue = {
+  cities: [],
+  companies: [],
+  search: "",
+};
+
+export const MOCK_USERS: User[] = [
   {
     id: 1,
     name: "Leanne Graham",

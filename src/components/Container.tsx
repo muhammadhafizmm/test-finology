@@ -3,7 +3,7 @@ import { PropsWithChildren } from "react";
 
 export default function Container({ children }: PropsWithChildren) {
   return (
-    <ChakraContainer display="flex" minH={{ base: "500px", md: "vh" }}>
+    <ChakraContainer display="flex" minH="vh">
       {children}
     </ChakraContainer>
   );

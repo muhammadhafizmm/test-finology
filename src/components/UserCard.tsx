@@ -24,7 +24,7 @@ export default function UserCard({ user }: Props) {
             <Avatar.Fallback>{getUserInitial(name)}</Avatar.Fallback>
           </Avatar.Root>
           <Flex direction="column">
-            <Text textAlign="md" fontWeight="semibold">
+            <Text textStyle="md" fontWeight="semibold">
               {name}
             </Text>
             <Text textStyle="sm">{email}</Text>

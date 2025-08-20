@@ -14,3 +14,9 @@ export type User = {
   website: string;
   company: { name: string; catchPhrase: string; bs: string };
 };
+
+export type UserFilterValue = {
+  cities: string[];
+  companies: string[];
+  search: string;
+};

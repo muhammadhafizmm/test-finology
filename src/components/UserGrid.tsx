@@ -4,22 +4,18 @@ import { useGetAllUser } from "../hooks/user";
 import { User } from "../types/User";
 import UserCard from "./UserCard";
 
-type Props = {
-  useQuery: typeof useGetAllUser;
-};
+type Props = Omit<ReturnType<typeof useGetAllUser>, "options">;
 
-export default function UserGrid({ useQuery }: Props) {
-  const { data: users, loading, error, refetch } = useQuery();
-
+export default function UserGrid({ data, loading, error, refetch }: Props) {
   if (loading) return <Loading />;
   if (error) {
     // Log the error to the console for debugging
     console.error("[UserGrid] Error fetching users:", error);
     return <Error onRetry={refetch} />;
   }
-  if (!users || users.length === 0) return <Empty />;
+  if (!data || data.length === 0) return <Empty />;
 
-  return <Data users={users} />;
+  return <Data users={data} />;
 }
 
 type DataProps = {
@@ -27,7 +23,7 @@ type DataProps = {
 };
 function Data({ users }: DataProps) {
   return (
-    <Stack gap="5" direction="row" wrap="wrap" justify="center">
+    <Stack gap="5" mb="5" direction="row" wrap="wrap" justify="center">
       <For each={users}>{(user) => <UserCard user={user} key={user.id} />}</For>
     </Stack>
   );
@@ -47,7 +43,9 @@ function Empty() {
 function Loading() {
   return (
     <Stack gap="5" direction="row" wrap="wrap" justify="center">
-      <For each={[...Array(3).keys()]}>{() => <UserCard.Skeleton />}</For>
+      <For each={[...Array(3).keys()]}>
+        {(idx) => <UserCard.Skeleton key={idx} />}
+      </For>
     </Stack>
   );
 }
